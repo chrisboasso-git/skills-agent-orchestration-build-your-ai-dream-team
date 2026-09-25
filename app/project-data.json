@@ -1,0 +1,39 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding Refresh",
+      "owner": "Maya Chen",
+      "status": "On track",
+      "recentActivity": "Published the updated contributor guide and scheduled the next onboarding session.",
+      "priority": "High"
+    },
+    {
+      "name": "API Reliability Initiative",
+      "owner": "Jordan Williams",
+      "status": "At risk",
+      "recentActivity": "Completed the incident review and identified two services that need additional load testing.",
+      "priority": "Critical"
+    },
+    {
+      "name": "Design System Expansion",
+      "owner": "Priya Nair",
+      "status": "In progress",
+      "recentActivity": "Added accessible form patterns and opened component documentation for team review.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Q4 Usage Insights",
+      "owner": "Lucas Martin",
+      "status": "On track",
+      "recentActivity": "Connected the analytics export and shared the first usage trends with stakeholders.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Mobile Release Readiness",
+      "owner": "Elena Rodriguez",
+      "status": "Blocked",
+      "recentActivity": "Waiting for the final security review before the release candidate can enter QA.",
+      "priority": "High"
+    }
+  ]
+}

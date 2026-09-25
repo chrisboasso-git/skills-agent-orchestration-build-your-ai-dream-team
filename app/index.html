@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="Project Pulse home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Project Pulse</span>
+      </a>
+      <div class="topbar-context">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>Team workspace</span>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Mona’s team <span class="eyebrow-rule" aria-hidden="true"></span> Weekly overview</p>
+          <h1 id="page-title">A clear view of <em>what’s moving.</em></h1>
+          <p class="hero-intro">Stay close to the work that matters. See project health, ownership, and the latest momentum at a glance.</p>
+        </div>
+        <div class="hero-stat" aria-label="Project health summary">
+          <span class="stat-label">Portfolio pulse</span>
+          <strong id="project-count">—</strong>
+          <span class="stat-caption">active projects</span>
+        </div>
+      </section>
+
+      <section class="dashboard-toolbar" aria-label="Project overview controls">
+        <div>
+          <h2>Project overview</h2>
+          <p id="last-updated" class="muted">Syncing project data…</p>
+        </div>
+        <div class="legend" aria-label="Status legend">
+          <span><i class="legend-dot legend-dot--active" aria-hidden="true"></i> On track</span>
+          <span><i class="legend-dot legend-dot--watch" aria-hidden="true"></i> Needs attention</span>
+        </div>
+      </section>
+
+      <div id="project-grid" class="project-grid" aria-live="polite" aria-busy="true">
+        <article class="project-card project-card--loading" aria-label="Loading project data">
+          <div class="loading-bar loading-bar--wide"></div>
+          <div class="loading-bar"></div>
+          <div class="loading-bar loading-bar--short"></div>
+        </article>
+      </div>
+      <p id="data-error" class="data-error" role="alert" hidden></p>
+    </main>
+
+    <footer class="footer">
+      <span>Project Pulse</span>
+      <span>Built for focused collaboration <span aria-hidden="true">✦</span></span>
+    </footer>
+  </div>
+
+  <script>
+    const fallbackProjects = [
+      {
+        name: "Contributor experience",
+        owner: "Mona",
+        status: "On track",
+        recentActivity: "Design review completed yesterday",
+        priority: "High",
+        summary: "Making the path from first issue to first contribution feel effortless."
+      },
+      {
+        name: "Documentation refresh",
+        owner: "Avery Chen",
+        status: "Needs attention",
+        recentActivity: "12 pages updated this week",
+        priority: "Medium",
+        summary: "A friendlier, more discoverable home for the team’s shared knowledge."
+      },
+      {
+        name: "Community toolkit",
+        owner: "Jordan Lee",
+        status: "On track",
+        recentActivity: "Beta feedback is being triaged",
+        priority: "High",
+        summary: "Practical templates and tools to help contributors build with confidence."
+      }
+    ];
+
+    const grid = document.querySelector("#project-grid");
+    const count = document.querySelector("#project-count");
+    const lastUpdated = document.querySelector("#last-updated");
+    const dataError = document.querySelector("#data-error");
+
+    function slug(value) {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    }
+
+    function projectCard(project, index) {
+      const status = project.status || "Status unavailable";
+      const priority = project.priority || "Unassigned";
+      const summary = project.summary || "Project details are being prepared.";
+      return `
+        <article class="project-card" style="--card-index: ${index}">
+          <div class="card-heading">
+            <span class="project-number" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+            <span class="status-badge status-badge--${slug(status)}">
+              <span class="status-dot" aria-hidden="true"></span>${status}
+            </span>
+          </div>
+          <h3>${project.name || "Unnamed project"}</h3>
+          <p class="summary">${summary}</p>
+          <dl class="project-details">
+            <div>
+              <dt>Owner</dt>
+              <dd><span class="avatar" aria-hidden="true">${String(project.owner || "?").trim().charAt(0).toUpperCase()}</span>${project.owner || "Unassigned"}</dd>
+            </div>
+            <div>
+              <dt>Priority</dt>
+              <dd class="priority priority--${slug(priority)}"><span aria-hidden="true">◆</span>${priority}</dd>
+            </div>
+          </dl>
+          <div class="activity">
+            <span class="activity-icon" aria-hidden="true">↗</span>
+            <div><span class="activity-label">Recent activity</span><p>${project.recentActivity || "No recent activity"}</p></div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderProjects(projects, fromFallback) {
+      grid.innerHTML = projects.length
+        ? projects.map(projectCard).join("")
+        : '<p class="empty-state">No projects are available yet.</p>';
+      grid.setAttribute("aria-busy", "false");
+      count.textContent = projects.length;
+      lastUpdated.textContent = fromFallback ? "Showing preview data" : "Updated just now";
+    }
+
+    fetch("project-data.json")
+      .then(response => {
+        if (!response.ok) throw new Error(`Project data returned ${response.status}`);
+        return response.json();
+      })
+      .then(data => renderProjects(Array.isArray(data.projects) ? data.projects : [], false))
+      .catch(() => {
+        renderProjects(fallbackProjects, true);
+        dataError.hidden = false;
+        dataError.textContent = "Live project data is unavailable. Showing preview data.";
+      });
+  </script>
+</body>
+</html>
